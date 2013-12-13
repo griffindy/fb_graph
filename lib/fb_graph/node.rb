@@ -10,6 +10,7 @@ module FbGraph
       @identifier         = identifier
       @endpoint           = File.join(ROOT_URL, identifier.to_s)
       @access_token       = attributes[:access_token]
+      @app_secret         = attributes[:app_secret]
       @raw_attributes     = attributes
       @cached_collections = {}
     end
@@ -96,6 +97,7 @@ module FbGraph
     def build_params(params)
       _params_ = params.dup
       _params_[:access_token] ||= self.access_token
+      _params_[:appsecret_proof] ||= OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha256"), @app_secret, _params_[:access_token])
       _params_.delete_if do |k, v|
         v.blank? &&
         # NOTE: allow "key=false" in params (ex. for test user creation, it supports "installed=false")
